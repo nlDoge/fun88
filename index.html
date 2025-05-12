@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sic Bo</title>
+    <style>
+        body {
+            text-align: center;
+            margin: 20px;
+        }
+        button {
+            padding: 5px 10px;
+        }
+        #result, #stats {
+            margin-top: 10px;
+        }
+        #dice {
+            font-size: 40px;
+            margin-top: 10px;
+        }
+        #history {
+            margin-top: 10px;
+            width: 300px;
+            height: 100px;
+            border: 1px solid #000;
+            overflow-y: auto;
+            text-align: left;
+            padding: 5px;
+            display: inline-block;
+        }
+        .xiu { color: red; }
+        .tai { color: green; }
+        .shake {
+            animation: diceShake 0.6s ease-in-out;
+        }
+        @keyframes diceShake {
+            0% { transform: translateX(0) rotate(0deg); }
+            25% { transform: translateX(-10px) rotate(-10deg); }
+            50% { transform: translateX(10px) rotate(10deg); }
+            75% { transform: translateX(-5px) rotate(-5deg); }
+            100% { transform: translateX(0) rotate(0deg); }
+        }
+    </style>
+</head>
+<body>
+    <h1>Sic Bo</h1>
+    <button onclick="rollDice()">Quay Xúc Xắc</button>
+    <div id="dice">🎲🎲🎲</div>
+    <div id="result">Nhấn nút để quay</div>
+    <div id="stats">Tài: 0 | Xỉu: 0</div>
+    <div id="history">Lịch sử: Chưa có</div>
+
+    <script>
+        const diceFaces = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅']; // Unicode xúc xắc 1-6
+        let history = [];
+        let taiCount = 0;
+        let xiuCount = 0;
+
+        function rollDice() {
+            const die1 = Math.floor(Math.random() * 6) + 1;
+            const die2 = Math.floor(Math.random() * 6) + 1;
+            const die3 = Math.floor(Math.random() * 6) + 1;
+            const sum = die1 + die2 + die3;
+            
+            // Xác định Tài/Xỉu (11 trở lên là Tài)
+            let status = sum <= 10 ? '<span class="xiu">Xỉu</span>' : 
+                         '<span class="tai">Tài</span>';
+            
+            // Hiển thị xúc xắc với hiệu ứng lắc
+            const diceDiv = document.getElementById('dice');
+            diceDiv.classList.add('shake');
+            diceDiv.innerHTML = `${diceFaces[die1-1]} ${diceFaces[die2-1]} ${diceFaces[die3-1]}`;
+            setTimeout(() => diceDiv.classList.remove('shake'), 600);
+            
+            // Cập nhật kết quả
+            document.getElementById('result').innerHTML = 
+                `Xúc xắc: ${die1}, ${die2}, ${die3} | Tổng: ${sum} (${status})`;
+            
+            // Cập nhật thống kê
+            if (sum <= 10) xiuCount++;
+            else taiCount++;
+            document.getElementById('stats').innerHTML = 
+                `Tài: ${taiCount} | Xỉu: ${xiuCount}`;
+            
+            // Thêm vào lịch sử
+            history.push(`Xúc xắc: ${die1}, ${die2}, ${die3} | Tổng: ${sum} (${status})`);
+            
+            // Cập nhật lịch sử trong ô
+            document.getElementById('history').innerHTML = 
+                'Lịch sử:<br>' + 
+                (history.length ? history.map((entry, index) => `${index + 1}. ${entry}`).join('<br>') : 'Chưa có');
+        }
+    </script>
+</body>
+</html>
